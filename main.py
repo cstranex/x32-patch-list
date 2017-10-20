@@ -12,6 +12,8 @@ import csv
 import re
 import logging
 
+from collections import defaultdict
+
 logger = logging.getLogger(__name__)
 
 CONFIG_RE = re.compile(r'/(ch|auxin|bus|mtx|main)/([0-3][0-9]|st|m)/config')
@@ -22,6 +24,13 @@ OUTPUTS_RE = re.compile(r'/outputs/(aux|aes|main|p16)/([0-3][0-9])$')
 
 OUTPUTS = ['bus', 'mtx', 'main']
 INPUTS = ['ch', 'auxin']
+
+MAX_CHANNELS = {
+    'aes50a': 48,
+    'aes50b': 48,
+    'local': 40,
+    'card': 32,
+}
 
 """
 Routing and Source information
@@ -67,11 +76,25 @@ def RouteSourceFromRouteGroup(group, offset):
     """ Return a route source from a route group and offset"""
 
     src, n = re.match(
-        '(AN|A|B|OUT|CARD|P16|AUX/CR|AUX/TB)([0-9][0-9]?)?',
+        '(AN|OUT|CARD|P16|AUX/CR|AUX/TB|AUX|A|B)([0-9][0-9]?)?',
         group
     ).groups()  # Ugly regex to split types and type offsets
 
-    if src == 'AN':
+    if src == 'AUX/CR':
+        if offset < 6:
+            return 'aux.{:02}'.format(offset + 1)
+        elif offset == 6:
+            return 'cr.0l'
+        elif offset == 7:
+            return 'cr.02'
+    elif src == 'AUX/TB':
+        if offset < 6:
+            return 'auxin.{:02}'.format(offset + 1)
+        elif offset == 6:
+            return 'tb'
+    elif src == 'AUX':
+        return 'local.{:02}'.format(offset + 33)
+    elif src == 'AN':
         return '{}.{:02}'.format(
             'local',
             offset + int(n)
@@ -101,18 +124,6 @@ def RouteSourceFromRouteGroup(group, offset):
             'p16',
             offset + int(n)
         )
-    elif src == 'AUX/CR':
-        if offset < 6:
-            return 'aux.{:02}'.format(offset + 1)
-        elif offset == 6:
-            return 'cr.0l'
-        elif offset == 7:
-            return 'cr.02'
-    elif src == 'AUX/TB':
-        if offset < 6:
-            return 'auxin.{:02}'.format(offset + 1)
-        elif offset == 6:
-            return 'tb'
 
     return None
 
@@ -233,21 +244,24 @@ class ScnParser(object):
 
     def __init__(self):
         self.route = {}
-
         self.channels = {}
         self.outputs = {}
+        self.channel_by_route = defaultdict(list)
+        self.input_route_source = {}
+        self.output_route_source = defaultdict(list)
 
-    def ParseFile(self, filename):
-        """ Parse a scene file """
+    def ParseFile(self, fobj):
+        """ Parse a file-like object """
 
-        with open(filename, 'r') as _file:
-            for line in csv.reader(_file, delimiter=' '):
-                if ROUTING_RE.match(line[0]):
-                    self.ParseRouting(line)
-                elif CONFIG_RE.match(line[0]):
-                    self.ParseConfig(line)
-                elif OUTPUTS_RE.match(line[0]):
-                    self.ParseOutput(line)
+        self.__init__()
+
+        for line in csv.reader(fobj, delimiter=' '):
+            if ROUTING_RE.match(line[0]):
+                self.ParseRouting(line)
+            elif CONFIG_RE.match(line[0]):
+                self.ParseConfig(line)
+            elif OUTPUTS_RE.match(line[0]):
+                self.ParseOutput(line)
 
     def ParseRouting(self, line):
         """ Parse routing information """
@@ -265,16 +279,28 @@ class ScnParser(object):
                     routing_type.lower(),
                     (n * group_size) + i + 1
                 )
+
+                route_source = RouteSourceFromRouteGroup(
+                    group, i
+                )
+
                 if name:
                     if routing_type == 'IN':
-                        route_source = None
+                        src = None
+
+                        self.input_route_source[
+                            route_source
+                        ] = route_path
                     else:
-                        route_source = RouteSourceFromRouteGroup(
-                            group, i
+                        src = route_source
+
+                        self.output_route_source[route_source].append(
+                            route_path
                         )
+
                     self.route[route_path] = {
                         'name': name,
-                        'output_key': route_source
+                        'output_key': src
                     }
                 else:
                     self.route[route_path] = {
@@ -314,16 +340,46 @@ class ScnParser(object):
             if config_type == 'ch':
                 config_type = 'in'
 
-            self.channels['in.{}.{}'.format(config_type, ch_num)] = {
+            route_key = GetRouteKeyFromSource(int(source))
+            chan_key = 'in.{}.{}'.format(config_type, ch_num)
+
+            self.channels[chan_key] = {
                 'name': name,
-                'route_key': GetRouteKeyFromSource(int(source)),
+                'route_key': route_key,
                 'channel_index': int(ch_num),
                 'color': colour
             }
+            self.channel_by_route[route_key].append(self.channels[chan_key])
 
     def GetRoute(self, route):
         """ Get a route by key """
         return self.route.get(route)
+
+    def GetChannelListForType(self, input_type):
+        """
+            Iterate through all inputs for type and find channel sources.
+
+            eg:
+            GetInputPatchForType('aes50a')
+            [{'name': 'Test', channel_index: 1}, None, None, ...]
+        """
+
+        # Step 1: Get the route list for IN
+        patch = []
+        for i in range(MAX_CHANNELS[input_type]):
+            key = '{}.{:02}'.format(input_type, i + 1)
+
+            if key not in self.input_route_source:
+                patch.append(None)
+                continue
+
+            route_key = self.input_route_source[key]
+            if self.channel_by_route[route_key]:
+                patch.append(self.channel_by_route[route_key])
+            else:
+                patch.append(None)
+
+        return patch
 
     def GetOutput(self, output):
         """ Get an output by key """
