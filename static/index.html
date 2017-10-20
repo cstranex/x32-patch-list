@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Patch List Creator</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <div class="jumbotron">
+        <div class="container">
+            <h1>X32 Patch List Creator</h1>
+            <p>Quickly create patch lists from X32 scene files</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <form method="post" action="/generate" enctype="multipart/form-data" class="form-horizontal">
+                    <div class="col-sm-8">
+                        <input id="upload" type="file" name="scene">
+                    </div>
+                    <div class="col-sm-3">
+                        <button id="submit" class="btn btn-success" type="submit">Generate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $('#upload').change(function () {
+                $("#submit").text("Uploading...");
+                $("#submit").click();
+            });
+        });
+    </script>
+</body>
+
+</html>

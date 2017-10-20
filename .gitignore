@@ -1,0 +1,5 @@
+lib/
+*.pyc
+__pycache__
+.pylintrc
+.vscode/

@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Patch List Creator</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <a class="btn btn-default" href="/" target="_parent">Home</a>
+    <a class="btn btn-primary" id="print">Print</a>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $(function () {
+        $('#print').click(function () {
+            window.parent.print();
+        });
+    });
+</script>
+
+</html>

@@ -1,0 +1,34 @@
+{% import 'util.html' as util %} {% for type in ['local', 'aes50a', 'aes50b', 'card'] %}
+<table>
+    <thead>
+        <caption>{{TYPE_NAMES[type]}} Patch List</caption>
+        <tr>
+            <th>Input</th>
+            <th>Desk</th>
+            <th></th>
+            <th>Name</th>
+            <th>Source</th>
+            <th>Remarks</th>
+            <th>
+                <input type="checkbox" class="togglechildren">
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in parser.GetChannelListForType(type) %} {% if not row %}{% set _row = [{}] %}{% else %}{% set _row = row %}{%
+        endif %} {% set cycle = loop.cycle('odd', 'even') %} {% set parent_loop = loop %} {% for chan in _row %}
+        <tr class="{{cycle}}">
+            {% if loop.index0 == 0 %}
+            <td>{{parent_loop.index}}</td>{% else %}
+            <td></td>{% endif %}
+            <td>{{chan.channel_index}}</td> {# TODO: Add prefix (eg: Aux In) #}
+            <td class="colour col-{{chan.color}}"></td>
+            <td>{{chan.name}}</td>
+            <td>{{ util.user_input() }}</td>
+            <td>{{ util.user_input() }}</td>
+            <td>{{ util.checkbox(chan is not none) }}</td>
+        </tr>
+        {% endfor %} {% endfor %}
+    </tbody>
+</table>
+{%endfor%}

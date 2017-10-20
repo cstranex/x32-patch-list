@@ -1,0 +1,130 @@
+body {
+  font-size: 10pt;
+}
+
+table {
+  width: 80%;
+  border-collapse: collapse;
+  font-family: monospace;
+  margin-bottom: 2em;
+}
+
+td {
+  border: 1px #000 solid;
+}
+
+table textarea {
+  margin-left: 0.5em;
+  width: 95%;
+  font-family: monospace;
+  height: 1em;
+  background: none;
+  border: 0px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+caption {
+  padding: 1em;
+  font-size: 16pt;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+td.colour {
+  width: 1.5em;
+}
+
+th {
+  text-align: left;
+}
+
+/* Checkbox */
+td:last-child,
+th:last-child {
+  width: 1em;
+  text-align: center;
+}
+
+/* Type */
+td:nth-child(1) {
+  width: 3em;
+  text-align: right;
+  padding-right: 0.5em;
+}
+
+/* Line */
+td:nth-child(2) {
+  width: 3em;
+  text-align: right;
+  padding-right: 0.5em;
+}
+
+/* Name */
+td:nth-child(4) {
+  width: 10em;
+  padding-left: 0.5em;
+}
+
+/* Source and Remarks */
+td:nth-child(5),
+td:nth-child(6) {
+  width: 25em;
+}
+
+/* Channel Colours */
+
+.col-RD,
+.col-RDi {
+  background: #ff0000 !important;
+}
+
+.col-CY,
+.col-CYi {
+  background: #00ffff !important;
+}
+
+.col-GN,
+.col-GNi {
+  background: #00ff00 !important;
+}
+
+.col-BL,
+.col-BLi {
+  background: #0000ff !important;
+}
+
+.col-YE,
+.col-YEi {
+  background: #ffff00 !important;
+}
+
+.col-WH,
+.col-WHi {
+  background: #ffffff !important;
+}
+
+.col-MG,
+.col-MGi {
+  background: #ff00ff !important;
+}
+
+.col-OFF,
+.col-OFFi {
+  background: #000000 !important;
+}
+
+.odd td {
+  background: #ffffff;
+}
+
+.even td {
+  background: #eeeeee;
+}
+
+iframe {
+  border: 0;
+  width: 100%;
+  height: 48px;
+  border-bottom: 1px #000 solid;
+}

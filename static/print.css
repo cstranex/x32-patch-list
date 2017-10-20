@@ -1,0 +1,42 @@
+@page {
+  size: A4;
+}
+
+body {
+  font-size: 7pt !important;
+}
+
+table {
+  page-break-before: always;
+}
+
+td:last-child {
+  display: none;
+}
+
+table {
+  width: 100% !important;
+}
+
+textarea {
+  border: 0 !important;
+  border-style: none !important;
+  font-size: 7pt !important;
+}
+
+td {
+  -webkit-print-color-adjust: exact;
+  color-adjust: exact;
+}
+
+tr.ignore {
+  display: none !important;
+}
+
+.togglechildren {
+  display: none !important;
+}
+
+iframe {
+  display: none !important;
+}

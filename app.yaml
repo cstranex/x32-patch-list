@@ -1,0 +1,15 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /generate
+  secure: always
+  script: fe.app
+
+- url: /
+  static_files: static/index.html
+  upload: static/index.html
+
+- url: /
+  static_dir: static/
