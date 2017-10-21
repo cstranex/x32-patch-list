@@ -19,7 +19,7 @@
         endif %} {% set cycle = loop.cycle('odd', 'even') %} {% set parent_loop = loop %} {% for chan in _row %}
         <tr class="{{cycle}}">
             {% if loop.index0 == 0 %}
-            <td>{{parent_loop.index}}</td>{% else %}
+            <td>{{GetSourceIndex(type, parent_loop.index) }}</td>{% else %}
             <td></td>{% endif %}
             <td>{{chan.channel_index}}</td> {# TODO: Add prefix (eg: Aux In) #}
             <td class="colour col-{{chan.color}}"></td>

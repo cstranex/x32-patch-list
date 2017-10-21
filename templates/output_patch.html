@@ -27,7 +27,7 @@
             <td>{{ util.checkbox(false) }}</td>
             {% else %}
             <td>{{loop.index}}</td>
-            <td>{{row.channel_index}}</td>
+            <td>{% if row.mix %}{{ GetMixName(row.mix, row.mix_index) }}{% else %}{{row.channel_index}}{% endif %}</td>
             <td class="colour col-{{row.color}}"></td>
             <td>{{row.name}}</td>
             <td>{{ util.user_input() }}</td>

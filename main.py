@@ -101,7 +101,7 @@ def RouteSourceFromRouteGroup(group, offset):
         elif offset == 6:
             return 'tb'
     elif src == 'AUX':
-        return 'local.{:02}'.format(offset + 33)
+        return 'in.{:02}'.format(offset + 33)
     elif src == 'AN':
         return '{}.{:02}'.format(
             'in',
@@ -335,7 +335,9 @@ class ScnParser(object):
 
             self.channels['{}.{}'.format(config_type, ch_num)] = {
                 'name': name,
-                'color': colour
+                'color': colour,
+                'mix_index': ch_num,
+                'mix': config_type
             }
 
         elif config_type in INPUTS:

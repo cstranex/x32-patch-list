@@ -26,12 +26,42 @@ TYPE_NAMES = {
     'out': 'Local',
 }
 
+MIX_NAMES = {
+    'bus': 'Bus',
+    'main': 'Main',
+}
+
+
+def GetMixName(type, n):
+    name = MIX_NAMES[type]
+    if type == 'main':
+        return name
+
+    if n.isdigit():
+        n = "{:02}".format(int(n))
+
+    return '{} {}'.format(name, n)
+
 
 def GetTypeName(type, n):
     if type == 'in' and n > 32:
         return 'Aux In'
     else:
         return TYPE_NAMES[type]
+
+
+def GetSourceIndex(type, n):
+    if type == 'in':
+        if n < 33:
+            return n
+        elif n < 39:
+            return 'Aux {:01}'.format(n - 32)
+        elif n < 40:
+            return 'USB L'
+        elif n < 41:
+            return 'USB R'
+    else:
+        return n
 
 
 @app.route('/generate', methods=['POST'])
@@ -63,7 +93,9 @@ def generate():
         'parser': parser,
         'options': opts,
         'TYPE_NAMES': TYPE_NAMES,
-        'GetTypeName': GetTypeName
+        'GetTypeName': GetTypeName,
+        'GetMixName': GetMixName,
+        'GetSourceIndex': GetSourceIndex
     }
 
     return render_template('template.html', **kwargs)
