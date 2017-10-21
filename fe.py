@@ -17,10 +17,13 @@ app.debug = True
 parser = ScnParser()
 
 TYPE_NAMES = {
-    'local': 'Local',
+    'in': 'Local',
     'aes50a': 'AES50-A',
     'aes50b': 'AES50-B',
     'card': 'Card',
+
+    'p16': 'Ultranet',
+    'out': 'Local',
 }
 
 

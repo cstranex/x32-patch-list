@@ -28,8 +28,16 @@ INPUTS = ['ch', 'auxin']
 MAX_CHANNELS = {
     'aes50a': 48,
     'aes50b': 48,
-    'local': 40,
+    'in': 40,
     'card': 32,
+}
+
+MAX_OUTPUTS = {
+    'aes50a': 48,
+    'aes50b': 48,
+    'card': 32,
+    'out': 16,
+    'p16': 16
 }
 
 """
@@ -96,7 +104,7 @@ def RouteSourceFromRouteGroup(group, offset):
         return 'local.{:02}'.format(offset + 33)
     elif src == 'AN':
         return '{}.{:02}'.format(
-            'local',
+            'in',
             offset + int(n)
         )
     elif src == 'A':
@@ -248,7 +256,7 @@ class ScnParser(object):
         self.outputs = {}
         self.channel_by_route = defaultdict(list)
         self.input_route_source = {}
-        self.output_route_source = defaultdict(list)
+        self.output_route_source = {}
 
     def ParseFile(self, fobj):
         """ Parse a file-like object """
@@ -294,9 +302,7 @@ class ScnParser(object):
                     else:
                         src = route_source
 
-                        self.output_route_source[route_source].append(
-                            route_path
-                        )
+                        self.output_route_source[route_path] = route_source
 
                     self.route[route_path] = {
                         'name': name,
@@ -316,10 +322,8 @@ class ScnParser(object):
         if config_type == 'main':
             config_type = 'out'
 
-        self.outputs['{}.{}'.format(config_type, ch_num)] = {
-            'name': GetNameForOutput(config_type, ch_num),
-            'channel_key': GetChannelKeyFromSource(int(source))
-        }
+        self.outputs['{}.{}'.format(
+            config_type, ch_num)] = GetChannelKeyFromSource(int(source))
 
     def ParseConfig(self, line):
         """ Parse configuration """
@@ -329,7 +333,7 @@ class ScnParser(object):
         if config_type in OUTPUTS:
             _path, name, _, colour = line  # osc path, name, icon, colour
 
-            self.channels['out.{}.{}'.format(config_type, ch_num)] = {
+            self.channels['{}.{}'.format(config_type, ch_num)] = {
                 'name': name,
                 'color': colour
             }
@@ -341,7 +345,7 @@ class ScnParser(object):
                 config_type = 'in'
 
             route_key = GetRouteKeyFromSource(int(source))
-            chan_key = 'in.{}.{}'.format(config_type, ch_num)
+            chan_key = '{}.{}'.format(config_type, ch_num)
 
             self.channels[chan_key] = {
                 'name': name,
@@ -354,6 +358,42 @@ class ScnParser(object):
     def GetRoute(self, route):
         """ Get a route by key """
         return self.route.get(route)
+
+    def GetOutputListForType(self, output_type):
+        """
+            Interate through all outputs for type and find output channel source.
+        """
+        patch = []
+        for i in range(MAX_OUTPUTS[output_type]):
+            key = '{}.{:02}'.format(output_type, i + 1)
+
+            if output_type == 'p16':
+                # Force something different
+                source = self.outputs.get(key)
+                if not source:
+                    patch.append(None)
+                    continue
+
+            elif key in self.output_route_source:
+                source = self.output_route_source[key]
+            else:
+                patch.append(None)
+                continue
+
+            if source.startswith('p16'):
+                patch.append({
+                    'p16': True,
+                    # 'channel_index': source.split('.')[1]
+                })
+                continue
+
+            # Linked to an Output
+            if source in self.outputs:
+                source = self.outputs.get(source)
+
+            patch.append(self.channels.get(source))
+
+        return patch
 
     def GetChannelListForType(self, input_type):
         """

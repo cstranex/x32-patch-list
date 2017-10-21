@@ -11,11 +11,7 @@
     <iframe src="/menu.html"></iframe>
 
     <h2>{{options.title}}</h2>
-    <pre>
-        {{parser.route_source_to_route_path}}
-        {{parser.channel_by_route}}
-        {{parser.output_route_source}}
-    </pre> {% include 'input_patch.html' %}
+    {% include 'input_patch.html' %} {% include 'output_patch.html' %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="/web.js"></script>
 </body>

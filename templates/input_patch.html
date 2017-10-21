@@ -1,7 +1,7 @@
-{% import 'util.html' as util %} {% for type in ['local', 'aes50a', 'aes50b', 'card'] %}
+{% import 'util.html' as util %} {% for type in ['in', 'aes50a', 'aes50b', 'card'] %}
 <table>
     <thead>
-        <caption>{{TYPE_NAMES[type]}} Patch List</caption>
+        <caption>{{TYPE_NAMES[type]}} Input Patch List</caption>
         <tr>
             <th>Input</th>
             <th>Desk</th>
@@ -10,12 +10,12 @@
             <th>Source</th>
             <th>Remarks</th>
             <th>
-                <input type="checkbox" class="togglechildren">
+                <input type="checkbox" class="togglechildren" checked>
             </th>
         </tr>
     </thead>
     <tbody>
-        {% for row in parser.GetChannelListForType(type) %} {% if not row %}{% set _row = [{}] %}{% else %}{% set _row = row %}{%
+        {% for row in parser.GetChannelListForType(type) %} {% if not row %}{% set _row = [none] %}{% else %}{% set _row = row %}{%
         endif %} {% set cycle = loop.cycle('odd', 'even') %} {% set parent_loop = loop %} {% for chan in _row %}
         <tr class="{{cycle}}">
             {% if loop.index0 == 0 %}

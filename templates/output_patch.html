@@ -1,0 +1,41 @@
+{% import 'util.html' as util %} {% for type in ['out', 'aes50a', 'aes50b', 'card', 'p16'] %}
+<table>
+    <thead>
+        <caption>{{TYPE_NAMES[type]}} Output Patch List</caption>
+        <tr>
+            <th>Output</th>
+            <th>Source</th>
+            <th></th>
+            <th>Name</th>
+            <th>Source</th>
+            <th>Remarks</th>
+            <th>
+                <input type="checkbox" class="togglechildren">
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in parser.GetOutputListForType(type) %}
+        <tr class="{{loop.cycle('odd', 'even')}}">
+            {% if row.p16 %}
+            <td>{{loop.index}}</td>
+            <td></td>
+            <td class="colour col-OFF"></td>
+            <td>Ultranet</td>
+            <td></td>
+            <td></td>
+            <td>{{ util.checkbox(false) }}</td>
+            {% else %}
+            <td>{{loop.index}}</td>
+            <td>{{row.channel_index}}</td>
+            <td class="colour col-{{row.color}}"></td>
+            <td>{{row.name}}</td>
+            <td>{{ util.user_input() }}</td>
+            <td>{{ util.user_input() }}</td>
+            <td>{{ util.checkbox(row is not none) }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{%endfor%}
