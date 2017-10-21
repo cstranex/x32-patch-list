@@ -16,11 +16,17 @@ from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
-CONFIG_RE = re.compile(r'/(ch|auxin|bus|mtx|main)/([0-3][0-9]|st|m)/config')
-ROUTING_RE = re.compile(r'/config/routing/(IN|AES50A|AES50B|CARD|OUT)')
+CONFIG_RE = re.compile(
+    r'/(ch|auxin|bus|mtx|main|fxrtn)/([0-3][0-9]|st|m)/config'
+)
+ROUTING_RE = re.compile(
+    r'/config/routing/(IN|AES50A|AES50B|CARD|OUT)'
+)
 
 # main = outputs
-OUTPUTS_RE = re.compile(r'/outputs/(aux|aes|main|p16)/([0-3][0-9])$')
+OUTPUTS_RE = re.compile(
+    r'/outputs/(aux|aes|main|p16)/([0-3][0-9])$'
+)
 
 OUTPUTS = ['bus', 'mtx', 'main']
 INPUTS = ['ch', 'auxin']
@@ -37,7 +43,9 @@ MAX_OUTPUTS = {
     'aes50b': 48,
     'card': 32,
     'out': 16,
-    'p16': 16
+    'p16': 16,
+    'aux': 6,
+    'aes': 2
 }
 
 """
@@ -92,9 +100,9 @@ def RouteSourceFromRouteGroup(group, offset):
         if offset < 6:
             return 'aux.{:02}'.format(offset + 1)
         elif offset == 6:
-            return 'cr.0l'
+            return 'mon.l'
         elif offset == 7:
-            return 'cr.02'
+            return 'mon.r'
     elif src == 'AUX/TB':
         if offset < 6:
             return 'auxin.{:02}'.format(offset + 1)
@@ -206,8 +214,10 @@ def GetChannelKeyFromSource(source):
     """ Return a channel key for an output's source integer """
     if source == 0:
         return None
-    elif source < 3:
-        return 'main.st'
+    elif source == 1:
+        return 'main.l'
+    elif source == 2:
+        return 'main.r'
     elif source == 3:
         return 'main.m'
     elif source <= 19:
@@ -271,6 +281,23 @@ class ScnParser(object):
             elif OUTPUTS_RE.match(line[0]):
                 self.ParseOutput(line)
 
+        # Automatically create some presets for Monitor L, R and TB
+        self.channels['tb'] = {
+            'name': 'Talkback',
+            'color': 'INT',
+            'internal': 'tb'
+        }
+        self.channels['mon.l'] = {
+            'name': 'Monitor L',
+            'color': 'INT',
+            'internal': 'mon'
+        }
+        self.channels['mon.r'] = {
+            'name': 'Monitor R',
+            'color': 'INT',
+            'internal': 'mon'
+        }
+
     def ParseRouting(self, line):
         """ Parse routing information """
 
@@ -333,12 +360,22 @@ class ScnParser(object):
         if config_type in OUTPUTS:
             _path, name, _, colour = line  # osc path, name, icon, colour
 
+            if config_type == 'main' and ch_num == 'st':
+                ch_num = 'l'
+
             self.channels['{}.{}'.format(config_type, ch_num)] = {
                 'name': name,
                 'color': colour,
                 'mix_index': ch_num,
                 'mix': config_type
             }
+
+            if config_type == 'main' and ch_num == 'l':
+                self.channels['main.r'] = {}
+                self.channels['main.r'].update(self.channels['main.l'])
+                self.channels['main.r'].update({
+                    'mix_index': 'r'
+                })
 
         elif config_type in INPUTS:
             _path, name, _, colour, source = line  # osc path, name, icon, colour, source
@@ -352,10 +389,19 @@ class ScnParser(object):
             self.channels[chan_key] = {
                 'name': name,
                 'route_key': route_key,
+                'channel': config_type,
                 'channel_index': int(ch_num),
                 'color': colour
             }
             self.channel_by_route[route_key].append(self.channels[chan_key])
+        elif config_type == 'fxrtn':
+            _path, name, _, colour = line
+            self.channels['fx.{}'.format(ch_num)] = {
+                'name': name,
+                'color': colour,
+                'mix_index': ch_num,
+                'mix': config_type
+            }
 
     def GetRoute(self, route):
         """ Get a route by key """
@@ -369,13 +415,12 @@ class ScnParser(object):
         for i in range(MAX_OUTPUTS[output_type]):
             key = '{}.{:02}'.format(output_type, i + 1)
 
-            if output_type == 'p16':
-                # Force something different
+            if output_type in ['p16', 'aux', 'aes']:
+                # Source doesn't only have to be an output
                 source = self.outputs.get(key)
                 if not source:
                     patch.append(None)
                     continue
-
             elif key in self.output_route_source:
                 source = self.output_route_source[key]
             else:

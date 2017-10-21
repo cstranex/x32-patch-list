@@ -23,8 +23,22 @@ $(function() {
     $(this)
       .closest('table')
       .find('.togglevisible')
-      .prop('checked', $(this).is(':checked'));
+      .prop('checked', $(this).is(':checked'))
+      .change();
   });
+
+  $('.togglesection').change(function() {
+    if ($(this).is(':checked')) {
+      $(this)
+        .closest('table')
+        .removeClass('ignore');
+    } else {
+      $(this)
+        .closest('table')
+        .addClass('ignore');
+    }
+  });
+  $('.togglesection').change();
 
   // Auto-expand text area
   $('textarea').each(function() {

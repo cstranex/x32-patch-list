@@ -13,7 +13,13 @@
     <h2>{{options.title}}</h2>
     {% include 'input_patch.html' %} {% include 'output_patch.html' %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="/web.js"></script>
+    <script src="/web.js"></script> {% if not options.color %}
+    <style>
+        .colour {
+            display: none;
+        }
+    </style>
+    {% endif %}
 </body>
 
 </html>

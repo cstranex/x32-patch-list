@@ -46,24 +46,24 @@ th:last-child {
   text-align: center;
 }
 
-/* Type */
+/* In/Out */
 td:nth-child(1) {
-  width: 3em;
+  width: 3.8em;
   text-align: right;
-  padding-right: 0.5em;
+  padding-right: 0.4em;
 }
 
 /* Line */
 td:nth-child(2) {
-  width: 3em;
+  width: 3.8em;
   text-align: right;
-  padding-right: 0.5em;
+  padding-right: 0.4em;
 }
 
 /* Name */
 td:nth-child(4) {
   width: 10em;
-  padding-left: 0.5em;
+  padding-left: 0.4em;
 }
 
 /* Source and Remarks */
@@ -112,6 +112,10 @@ td:nth-child(6) {
 .col-OFF,
 .col-OFFi {
   background: #000000 !important;
+}
+
+.col-INT {
+  background: #777777 !important;
 }
 
 .odd td {

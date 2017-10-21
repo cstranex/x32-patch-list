@@ -18,6 +18,9 @@ parser = ScnParser()
 
 TYPE_NAMES = {
     'in': 'Local',
+    'aux': 'Aux',
+    'aes': 'AES',
+
     'aes50a': 'AES50-A',
     'aes50b': 'AES50-B',
     'card': 'Card',
@@ -29,13 +32,20 @@ TYPE_NAMES = {
 MIX_NAMES = {
     'bus': 'Bus',
     'main': 'Main',
+    'fxrtn': 'FX'
+}
+
+CHANNEL_NAMES = {
+    'auxin': 'Aux',
+
 }
 
 
 def GetMixName(type, n):
+    """ Prefix a channel with its mix name """
     name = MIX_NAMES[type]
     if type == 'main':
-        return name
+        return '{} {}'.format(name, n.upper())
 
     if n.isdigit():
         n = "{:02}".format(int(n))
@@ -43,7 +53,29 @@ def GetMixName(type, n):
     return '{} {}'.format(name, n)
 
 
+def GetChannelName(type, n):
+    """ Prefix a channel with its channel type """
+    if type in CHANNEL_NAMES:
+        return ('{} {}'.format(CHANNEL_NAMES[type], n))
+    else:
+        return n
+
+
+def GetDeskName(chan):
+    """ Return either an input or output channel name """
+    if not chan:
+        return ''
+
+    if 'mix' in chan:
+        return GetMixName(chan['mix'], chan['mix_index'])
+    elif 'channel' in chan:
+        return GetChannelName(chan['channel'], chan['channel_index'])
+
+    return ''
+
+
 def GetTypeName(type, n):
+    """ Return correct name from type """
     if type == 'in' and n > 32:
         return 'Aux In'
     else:
@@ -51,6 +83,7 @@ def GetTypeName(type, n):
 
 
 def GetSourceIndex(type, n):
+    """ Return correct source names """
     if type == 'in':
         if n < 33:
             return n
@@ -70,20 +103,12 @@ def generate():
         Generation method, accepts an uploaded scn file along with some user-specified options.
 
         Current options allowed (all are either 1 for true or 0 for false):
-        set-bg-color    -   Set the background colour of the table row to channel colour (if applicable)
-        set-fg-color    -   Set the foreground colour of the table row to channel colour (if applicable)
-        set-color       -   Add a separate column to show colour
-        hide-blank      -   Hide rows that have a blank name
-        hide-black      -   Hide black coloured rows
+        color           -   Add a separate column to show colour
         title           -   Title
     """
 
     opts = {
-        'setbgcolor': True if request.files.get('set-bg-color') == '1' else False,
-        'setfgcolor': True if request.files.get('set-fg-color') == '1' else False,
-        'setcolor': True if request.files.get('set-color') == '1' else False,
-        'hide-blank':  True if request.files.get('hide-blank') == '1' else False,
-        'hide-black': True if request.files.get('hide-black') == '1' else False,
+        'color': True if request.files.get('color', '1') == '1' else False,
         'title': request.files.get('title', '')
     }
 
@@ -94,8 +119,8 @@ def generate():
         'options': opts,
         'TYPE_NAMES': TYPE_NAMES,
         'GetTypeName': GetTypeName,
-        'GetMixName': GetMixName,
-        'GetSourceIndex': GetSourceIndex
+        'GetSourceIndex': GetSourceIndex,
+        'GetDeskName': GetDeskName
     }
 
     return render_template('template.html', **kwargs)

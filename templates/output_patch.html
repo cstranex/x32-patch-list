@@ -1,13 +1,15 @@
-{% import 'util.html' as util %} {% for type in ['out', 'aes50a', 'aes50b', 'card', 'p16'] %}
+{% import 'util.html' as util %} {% for type in ['out', 'aux', 'aes', 'aes50a', 'aes50b', 'card', 'p16'] %}
 <table>
+    <caption>{{TYPE_NAMES[type]}} Output Patch List
+        <input type="checkbox" class="togglesection" checked>
+    </caption>
     <thead>
-        <caption>{{TYPE_NAMES[type]}} Output Patch List</caption>
         <tr>
             <th>Output</th>
             <th>Source</th>
             <th></th>
             <th>Name</th>
-            <th>Source</th>
+            <th>Destination</th>
             <th>Remarks</th>
             <th>
                 <input type="checkbox" class="togglechildren">
@@ -27,7 +29,7 @@
             <td>{{ util.checkbox(false) }}</td>
             {% else %}
             <td>{{loop.index}}</td>
-            <td>{% if row.mix %}{{ GetMixName(row.mix, row.mix_index) }}{% else %}{{row.channel_index}}{% endif %}</td>
+            <td>{{GetDeskName(row)}}</td>
             <td class="colour col-{{row.color}}"></td>
             <td>{{row.name}}</td>
             <td>{{ util.user_input() }}</td>

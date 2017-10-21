@@ -1,7 +1,9 @@
 {% import 'util.html' as util %} {% for type in ['in', 'aes50a', 'aes50b', 'card'] %}
 <table>
+    <caption>{{TYPE_NAMES[type]}} Input Patch List
+        <input type="checkbox" class="togglesection" checked>
+    </caption>
     <thead>
-        <caption>{{TYPE_NAMES[type]}} Input Patch List</caption>
         <tr>
             <th>Input</th>
             <th>Desk</th>
@@ -21,7 +23,7 @@
             {% if loop.index0 == 0 %}
             <td>{{GetSourceIndex(type, parent_loop.index) }}</td>{% else %}
             <td></td>{% endif %}
-            <td>{{chan.channel_index}}</td> {# TODO: Add prefix (eg: Aux In) #}
+            <td>{{GetDeskName(chan)}}</td>
             <td class="colour col-{{chan.color}}"></td>
             <td>{{chan.name}}</td>
             <td>{{ util.user_input() }}</td>

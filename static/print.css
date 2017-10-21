@@ -7,15 +7,18 @@ body {
 }
 
 table {
-  page-break-before: always;
+  page-break-before: auto;
+  page-break-inside: avoid;
+  width: 100% !important;
+}
+
+tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
 }
 
 td:last-child {
   display: none;
-}
-
-table {
-  width: 100% !important;
 }
 
 textarea {
@@ -29,8 +32,12 @@ td {
   color-adjust: exact;
 }
 
-tr.ignore {
+.ignore {
   display: none !important;
+}
+
+thead {
+  display: table-header-group;
 }
 
 .togglechildren {
@@ -38,5 +45,9 @@ tr.ignore {
 }
 
 iframe {
+  display: none !important;
+}
+
+input[type='checkbox'] {
   display: none !important;
 }
