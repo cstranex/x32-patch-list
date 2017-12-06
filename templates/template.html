@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>{{options.title}} Patch List</title>
+    <title>Patch List</title>
     <link rel="stylesheet" href="/print.css" media="print" />
     <link rel="stylesheet" href="/web.css" />
 </head>
@@ -10,16 +10,14 @@
 <body>
     <iframe src="/menu.html"></iframe>
 
-    <h2>{{options.title}}</h2>
+    <div class="details">
+        <h1 id="title"></h1>
+        <textarea rows="10"></textarea>
+    </div>
+
     {% include 'input_patch.html' %} {% include 'output_patch.html' %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="/web.js"></script> {% if not options.color %}
-    <style>
-        .colour {
-            display: none;
-        }
-    </style>
-    {% endif %}
+    <script src="/web.js"></script>
 </body>
 
 </html>

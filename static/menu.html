@@ -7,8 +7,13 @@
 </head>
 
 <body>
-    <a class="btn btn-default" href="/" target="_parent">Home</a>
-    <a class="btn btn-primary" id="print">Print</a>
+    <div class="col-sm-2">
+        <a class="btn btn-default" href="/" target="_parent">Home</a>
+        <a class="btn btn-primary" id="print">Print</a>
+    </div>
+    <div class="col-sm-4">
+        <input class="form-control" type="text" name="title" placeholder="Title...">
+    </div>
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -17,6 +22,10 @@
         $('#print').click(function () {
             window.parent.print();
         });
+
+        $('input[name="title"]').keyup(function () {
+            window.parent.SetTitle($(this).val());
+        })
     });
 </script>
 

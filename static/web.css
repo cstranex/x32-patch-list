@@ -1,5 +1,24 @@
 body {
   font-size: 10pt;
+  font-family: sans-serif;
+}
+
+h1 {
+  text-align: center;
+  display: none;
+  font-size: 18pt;
+}
+
+.details {
+  padding-bottom: 0.1em;
+  margin-bottom: 0.5em;
+  border-bottom: 1px #000 solid;
+}
+
+textarea {
+  width: 95%;
+  border: 0px;
+  overflow: hidden;
 }
 
 table {
@@ -20,7 +39,8 @@ table textarea {
   height: 1em;
   background: none;
   border: 0px;
-  overflow: hidden;
+  word-wrap: break-word;
+  /*overflow: hidden;*/
   vertical-align: middle;
 }
 

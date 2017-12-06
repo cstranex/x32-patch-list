@@ -51,3 +51,7 @@ iframe {
 input[type='checkbox'] {
   display: none !important;
 }
+
+h1 {
+  display: block !important;
+}

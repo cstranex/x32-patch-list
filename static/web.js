@@ -11,6 +11,10 @@ function UpdateRow() {
   }
 }
 
+function SetTitle(t) {
+  $('#title').text(t);
+}
+
 $(function() {
   $('.togglevisible').each(function() {
     $(this).change(UpdateRow);

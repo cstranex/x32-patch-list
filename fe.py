@@ -100,23 +100,13 @@ def GetSourceIndex(type, n):
 @app.route('/generate', methods=['POST'])
 def generate():
     """
-        Generation method, accepts an uploaded scn file along with some user-specified options.
-
-        Current options allowed (all are either 1 for true or 0 for false):
-        color           -   Add a separate column to show colour
-        title           -   Title
+        Generation method, accepts an uploaded scn file
     """
-
-    opts = {
-        'color': True if request.files.get('color', '1') == '1' else False,
-        'title': request.files.get('title', '')
-    }
 
     parser.ParseFile(request.files['scene'])
 
     kwargs = {
         'parser': parser,
-        'options': opts,
         'TYPE_NAMES': TYPE_NAMES,
         'GetTypeName': GetTypeName,
         'GetSourceIndex': GetSourceIndex,
