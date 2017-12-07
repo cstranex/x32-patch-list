@@ -6,6 +6,9 @@
 
     The template has a checkbox for each section/line to show that row. There is also a
     remarks and source column that user can enter text in.
+
+    (c) Chris Stranex 2017 <cstranex@gmail.com>
+    Under the GNU GPL v2 Licence
 """
 
 from flask import Flask, request, render_template

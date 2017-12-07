@@ -5,6 +5,10 @@
     It will show a list on inputs, outputs and various routing
     information. It will ignore channels that are black ('off')
     or have not been named.
+
+
+    (c) Chris Stranex 2017 <cstranex@gmail.com>
+    Under the GNU GPL v2 Licence
 """
 
 import argparse
@@ -538,26 +542,3 @@ class ScnParser(object):
             Get what an XLR output is routed to
         """
         return self.route.get('out.{:02}'.format(channel), None)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description="X32 Patch List Generator"
-    )
-
-    parser.add_argument('filename', help="X32 Scene File")
-    parser.add_argument(
-        '--ignore-blank',
-        help="Ignore blank names",
-        default=True
-    )
-    parser.add_argument(
-        '--ignore-off',
-        help="Ignore channels set to off",
-        default=True
-    )
-
-    args = parser.parse_args()
-
-    scene_parser = ScnParser(args.ignore_blank, args.ignore_blank)
-    scene_parser.ParseFile(args.filename)
