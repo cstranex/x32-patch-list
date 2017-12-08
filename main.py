@@ -348,7 +348,11 @@ class ScnParser(object):
         """ Parse output routes """
         config_type, ch_num = OUTPUTS_RE.match(line[0]).groups()
 
-        _path, source, _tap, _phase = line
+        try:
+            _path, source, _tap, _phase = line
+        except ValueError:
+            logger.error("Splitting output line failed: %s", line)
+            raise RuntimeError("ParseOutput failed")
 
         if config_type == 'main':
             config_type = 'out'
@@ -362,7 +366,12 @@ class ScnParser(object):
         config_type, ch_num = CONFIG_RE.match(line[0]).groups()
 
         if config_type in OUTPUTS:
-            _path, name, _, colour = line  # osc path, name, icon, colour
+            try:
+                _path, name, _, colour = line  # osc path, name, icon, colour
+            except ValueError:
+                logger.error("Splitting output line failed: %s", line)
+                raise RuntimeError("ParseConfig Outputs failed")
+
 
             if config_type == 'main' and ch_num == 'st':
                 ch_num = 'l'
@@ -382,7 +391,11 @@ class ScnParser(object):
                 })
 
         elif config_type in INPUTS:
-            _path, name, _, colour, source = line  # osc path, name, icon, colour, source
+            try:
+                _path, name, _, colour, source = line  # osc path, name, icon, colour, source
+            except ValueError:
+                logger.error("Splitting input line failed: %s", line)
+                raise RuntimeError("ParseConfig Inputs failed")
 
             if config_type == 'ch':
                 config_type = 'in'

@@ -5,6 +5,9 @@ threadsafe: true
 skip_files:
  - ^env/.*$
 
+error_handlers:
+  - file: static/error.html
+
 handlers:
 - url: /generate
   secure: always
