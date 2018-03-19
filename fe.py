@@ -30,12 +30,15 @@ TYPE_NAMES = {
 
     'p16': 'Ultranet',
     'out': 'Local',
+
+    'mtx': 'Matrix'
 }
 
 MIX_NAMES = {
     'bus': 'Bus',
     'main': 'Main',
-    'fxrtn': 'FX'
+    'fxrtn': 'FX',
+    'mtx': 'Matrix'
 }
 
 CHANNEL_NAMES = {
