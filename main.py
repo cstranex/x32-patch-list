@@ -309,6 +309,9 @@ class ScnParser(object):
         if routing_type == 'OUT':
             group_size = 4
         else:
+            # TODO: The Aux in block is a special case
+            # The value can only have a few values (eg: A1-4)
+            # The last values must then stay as their defaults.
             group_size = 8
 
         for n, group in enumerate(line[1:]):
