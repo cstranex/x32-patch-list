@@ -123,3 +123,7 @@ def generate():
     }
 
     return render_template('template.html', **kwargs)
+
+
+if __name__ == '__main__':
+    app.run()
