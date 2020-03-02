@@ -67,6 +67,8 @@ CARD1-8.. - Card channels
 P161-8 .. - P-16 Outputs
 AUX/CR    - Aux 1-6 Channels + Control Room outs
 AUX/TB    - Aux 1-6 INPUTS from back of X32 + Talkback
+UOUT1-8.. - User Output routing (/config/userout/out)
+UIN1-8..  - User Input routing (/config/userrout/in)
 
 
 Source Numbers:
@@ -91,12 +93,40 @@ Source Numbers:
 
 """
 
+def UserSourceToRouteSource(source):
+    """Return a route group and offset for the given source index
+
+    The source numbers are:
+       0         - Off
+       1 - 32    - Local Input
+       33 - 80   - AES50 A
+       81 - 128  - AES50 B
+       129 - 160 - Card
+       161 - 168 - Aux (1-6 + Talkback)
+    """
+    if source == 0:
+        return None
+    elif source <= 32:  # Local In
+        return 'in.{:02}'.format(source)
+    elif source <= 80:  # AES A In
+        return 'aes50a.{:02}'.format(source - 32)
+    elif source <= 128:  # AES B In
+        return 'aes50b.{:02}'.format(source - 80)
+    elif source <= 160:  # Card In
+        return 'card.{:02}'.format(source - 128)
+    elif source <= 168:  # Aux In
+        if source > 166:
+            return 'tb'
+        return 'auxin.{:02}'.format(source - 160)
+    else:
+        return None
+
 
 def RouteSourceFromRouteGroup(group, offset):
     """ Return a route source from a route group and offset"""
 
     src, n = re.match(
-        '(AN|OUT|CARD|P16|AUX/CR|AUX/TB|AUX|A|B)([0-9][0-9]?)?',
+        '(UOUT|UIN|AN|OUT|CARD|P16|AUX/CR|AUX/TB|AUX|A|B)([0-9][0-9]?)?',
         group
     ).groups()  # Ugly regex to split types and type offsets
 
@@ -142,6 +172,16 @@ def RouteSourceFromRouteGroup(group, offset):
     elif src == 'P16':
         return '{}.{:02}'.format(
             'p16',
+            offset + int(n)
+        )
+    elif src == 'UIN':
+        return '{}.{:02}'.format(
+            'uin',
+            offset + int(n)
+        )
+    elif src == 'UOUT':
+        return '{}.{:02}'.format(
+            'uout',
             offset + int(n)
         )
 
@@ -265,6 +305,8 @@ class ScnParser(object):
     """ X32 File format parser """
 
     def __init__(self):
+        self.userin = []
+        self.userout = []
         self.route = {}
         self.channels = {}
         self.outputs = {}
@@ -278,7 +320,9 @@ class ScnParser(object):
         self.__init__()
 
         for line in csv.reader(fobj, delimiter=' '):
-            if ROUTING_RE.match(line[0]):
+            if line[0].startswith('/config/userrout/'):
+                self.ParseUserRouting(line)
+            elif ROUTING_RE.match(line[0]):
                 self.ParseRouting(line)
             elif CONFIG_RE.match(line[0]):
                 self.ParseConfig(line)
@@ -302,6 +346,12 @@ class ScnParser(object):
             'internal': 'mon'
         }
 
+    def ParseUserRouting(self, line):
+        if 'in' in line[0]:
+            self.userin = [int(x) for x in line[1:]]
+        else:
+            self.userout = [int(x) for x in line[1:]]
+
     def ParseRouting(self, line):
         """ Parse routing information """
 
@@ -316,6 +366,7 @@ class ScnParser(object):
 
         for n, group in enumerate(line[1:]):
             for i in range(group_size):
+
                 name = NameFromRouteGroup(group, i)
                 route_path = '{}.{:02}'.format(
                     routing_type.lower(),
@@ -325,6 +376,19 @@ class ScnParser(object):
                 route_source = RouteSourceFromRouteGroup(
                     group, i
                 )
+
+                if route_source.startswith('uin'):
+                    route_index = int(route_source.split('.')[1]) - 1
+                    ch_source = self.userin[route_index]
+                    route_source = UserSourceToRouteSource(ch_source)
+                    if route_source:
+                        name = 'User'
+                elif route_source.startswith('uout'):
+                    route_index = int(route_source.split('.')[1]) - 1
+                    ch_dest = self.userout[route_index]
+                    route_source = ""
+                    if route_source:
+                        name = 'User'
 
                 if name:
                     if routing_type == 'IN':

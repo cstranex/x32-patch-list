@@ -1,9 +1,7 @@
-runtime: python27
+runtime: python37
 api_version: 1
 threadsafe: true
-
-skip_files:
- - ^env/.*$
+entrypoint: gunicorn -b :$PORT fe:app
 
 error_handlers:
   - file: static/error.html
@@ -11,7 +9,7 @@ error_handlers:
 handlers:
 - url: /generate
   secure: always
-  script: fe.app
+  script: auto
 
 - url: /
   static_files: static/index.html

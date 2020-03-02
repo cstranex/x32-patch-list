@@ -10,6 +10,7 @@
     (c) Chris Stranex 2017 <cstranex@gmail.com>
     Under the GNU GPL v2 Licence
 """
+from io import StringIO
 
 from flask import Flask, request, render_template, redirect, url_for
 from main import ScnParser
@@ -112,7 +113,12 @@ def generate():
         Generation method, accepts an uploaded scn file
     """
 
-    parser.ParseFile(request.files['scene'])
+    data = request.files['scene'].read().decode('utf-8')
+    fobj = StringIO(newline='')
+    fobj.write(data)
+    fobj.seek(0)
+
+    parser.ParseFile(fobj)
 
     kwargs = {
         'parser': parser,
