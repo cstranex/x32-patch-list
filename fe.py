@@ -16,7 +16,6 @@ from flask import Flask, request, render_template, redirect, url_for
 from main import ScnParser
 
 app = Flask(__name__, static_url_path='/')
-app.debug = True
 
 parser = ScnParser()
 
