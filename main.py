@@ -140,7 +140,7 @@ def RouteSourceFromRouteGroup(group, offset):
     elif src == 'AUX/TB':
         if offset < 6:
             return 'auxin.{:02}'.format(offset + 1)
-        elif offset == 6:
+        else:
             return 'tb'
     elif src == 'AUX':
         return 'in.{:02}'.format(offset + 33)
